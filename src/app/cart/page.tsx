@@ -55,7 +55,11 @@ export default function CartPage() {
         setSuccessOrderId(result.orderId);
         clearCart();
       } else {
-        setError(result.error);
+        if (result.error?.includes("Unauthorized")) {
+          window.location.href = "/api/auth/login?returnTo=/cart";
+        } else {
+          setError(result.error);
+        }
       }
     } catch (e: any) {
       setError(e.message || "Checkout failed");

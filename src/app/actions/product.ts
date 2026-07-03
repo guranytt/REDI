@@ -6,8 +6,10 @@ import { getSession } from '@auth0/nextjs-auth0';
 export async function addProductAction(formData: FormData) {
   try {
     const session = await getSession();
-    // Default fallback for testing if not logged in
-    const userId = session?.user?.sub || '00000000-0000-0000-0000-000000000001'; 
+    if (!session?.user) {
+      throw new Error("Unauthorized: You must be logged in to manage products");
+    }
+    const userId = session.user.sub; 
 
     const supabase = await getSupabaseServerClient();
     

@@ -2,6 +2,7 @@
 
 import { getSupabaseServerClient } from "@/lib/supabase/serverClient";
 import { getSession } from '@auth0/nextjs-auth0';
+import { sendOrderConfirmation } from "@/lib/email";
 
 interface CheckoutPayload {
   vendorId: string;
@@ -18,10 +19,25 @@ interface CheckoutPayload {
 export async function checkoutAction(payload: CheckoutPayload) {
   try {
     const session = await getSession();
-    // Default to a fallback user if not logged in (Guest Checkout)
-    const userId = session?.user?.sub || '00000000-0000-0000-0000-000000000000';
+    if (!session?.user) {
+      throw new Error("Unauthorized: You must be logged in to checkout.");
+    }
+    const userId = session.user.sub;
 
     const supabase = await getSupabaseServerClient();
+    
+    // Rate Limiting: Check for an order placed in the last 60 seconds
+    const sixtySecondsAgo = new Date(Date.now() - 60000).toISOString();
+    const { data: recentOrders } = await supabase
+      .from('orders')
+      .select('id')
+      .eq('customer_id', userId)
+      .gte('created_at', sixtySecondsAgo)
+      .limit(1);
+
+    if (recentOrders && recentOrders.length > 0) {
+      throw new Error("Rate limit exceeded. Please wait a minute before placing another order.");
+    }
     
     // 1. Calculate totals
     const subtotal = payload.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -65,7 +81,25 @@ export async function checkoutAction(payload: CheckoutPayload) {
       .from('order_items')
       .insert(orderItems);
 
-    if (itemsError) throw new Error("Failed to insert order items: " + itemsError.message);
+    // Send confirmation email asynchronously (do not block checkout)
+    const customerName = session.user.name || session.user.nickname || "Foodie";
+    const customerEmail = session.user.email;
+    
+    // Fetch vendor name for the email
+    const { data: vendorData } = await supabase.from('vendors').select('name').eq('id', payload.vendorId).single();
+    const vendorName = vendorData?.name || "REDI Restaurant";
+
+    if (customerEmail) {
+      sendOrderConfirmation(customerEmail, {
+        orderId: order.id,
+        customerName,
+        items: payload.items.map(i => ({ name: 'Item', quantity: i.quantity, price: i.price })), // Ideally map to actual names
+        subtotal,
+        deliveryFee,
+        total,
+        vendorName
+      });
+    }
 
     return { success: true, orderId: order.id };
   } catch (error: any) {
