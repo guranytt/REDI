@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>REDI | Food Delivered Fast</title>
+<meta content="Order from your favorite restaurants with REDI. Fast delivery, live tracking, and the best local flavors." name="description"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Sora:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#e5eeff",
+                        "surface-variant": "#d3e4fe",
+                        "on-secondary-container": "#006f64",
+                        "primary-container": "#dc3311",
+                        "secondary-fixed": "#71f8e4",
+                        "on-tertiary-container": "#fffbff",
+                        "outline": "#916f68",
+                        "on-primary-container": "#fffbff",
+                        "surface-container-low": "#eff4ff",
+                        "on-surface-variant": "#5c403a",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "primary-fixed-dim": "#ffb4a4",
+                        "background": "#f8f9ff",
+                        "on-primary-fixed-variant": "#8d1600",
+                        "primary-fixed": "#ffdad3",
+                        "on-secondary-fixed-variant": "#005048",
+                        "on-surface": "#0b1c30",
+                        "tertiary-fixed-dim": "#ffb690",
+                        "outline-variant": "#e5beb5",
+                        "secondary": "#006b5f",
+                        "on-tertiary-fixed-variant": "#783200",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "primary": "#b41f00",
+                        "inverse-surface": "#213145",
+                        "inverse-primary": "#ffb4a4",
+                        "on-primary-fixed": "#3e0500",
+                        "tertiary-container": "#c05400",
+                        "secondary-container": "#6df5e1",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#dce9ff",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#cbdbf5",
+                        "on-error-container": "#93000a",
+                        "on-background": "#0b1c30",
+                        "tertiary-fixed": "#ffdbca",
+                        "on-tertiary-fixed": "#341100",
+                        "tertiary": "#994100",
+                        "surface-container-highest": "#d3e4fe",
+                        "surface-tint": "#b82000",
+                        "secondary-fixed-dim": "#4fdbc8",
+                        "on-secondary-fixed": "#00201c",
+                        "on-secondary": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "surface-bright": "#f8f9ff",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "16px",
+                        "lg": "40px",
+                        "xl": "64px",
+                        "base": "4px",
+                        "md": "24px",
+                        "xs": "8px",
+                        "container-margin": "20px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Sora"],
+                        "headline-lg": ["Sora"],
+                        "body-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Sora"],
+                        "headline-xl": ["Sora"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "14px", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        
+        .fade-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .hover-lift {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .hover-lift:hover {
+            transform: translateY(-8px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopNavBar -->
+<nav class="docked full-width top-0 sticky z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/20 shadow-sm">
+<div class="flex justify-between items-center w-full px-container-margin py-base max-w-7xl mx-auto min-h-[72px]">
+<div class="flex items-center gap-lg">
+<a class="font-headline-lg text-headline-lg font-black text-primary tracking-tighter" href="/">REDI</a>
+<div class="hidden md:flex items-center gap-md">
+<a class="font-label-md text-label-md text-primary font-bold border-b-2 border-primary" href="#">Restaurants</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Become a Vendor</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Become a Rider</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">About</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="hidden sm:block font-label-md text-label-md text-on-surface-variant hover:opacity-90 hover:scale-[1.02] transition-all px-4 py-2">Login</button>
+<button class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md text-label-md hover:opacity-90 hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20">Order Now</button>
+<button class="md:hidden text-on-surface">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</div>
+</nav>
+<main>
+<!-- Hero Section -->
+<section class="relative min-h-[85vh] flex items-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDhTLWQIg9GKnwxIxach3QcJrKjmBYOeIoIBPMEDzNM6fpjl81K610c3rHPIeQu0jVJfjGDYQZlM59k9BlF0Wr8p2bUwMI_TliEF6YM3H8vFPBBO17LmiKD-17DPzT1uzaoPNQZu6hLdksprfROKSjiExeDGtai2rOZRiGYgvrCPPalAhmoFy7uUaCi3eQlYS7j6VVvU5dIlF2ol7sgsprDdNyuHNqUZn15ZwyerVZ-oh2wGKQlyiOhXQomJrxhOAuHCg52B8gYwQo')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent"></div>
+</div>
+<div class="relative z-10 w-full max-w-7xl mx-auto px-container-margin py-xl text-center fade-up">
+<h1 class="font-headline-xl text-headline-xl md:text-[64px] md:leading-[1.1] mb-md text-on-surface max-w-3xl mx-auto">
+                    Food, delivered fast.
+                </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-lg">
+                    Order from your favorite restaurants, discover new local spots, and track every order from your phone.
+                </p>
+<!-- Central Search -->
+<div class="max-w-2xl mx-auto mb-md">
+<div class="relative group">
+<div class="absolute inset-y-0 left-6 flex items-center pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined">location_on</span>
+</div>
+<input class="w-full h-[72px] pl-16 pr-32 rounded-full border-none bg-surface-container-lowest shadow-2xl focus:ring-2 focus:ring-primary text-body-md focus:ring-primary/50 transition-all duration-300" placeholder="Enter your delivery address..." type="text"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 bg-primary text-on-primary px-8 h-12 rounded-full font-label-md text-label-md hover:opacity-90 transition-all hover:scale-105 duration-300">Search</button>
+</div>
+</div>
+<div class="flex flex-wrap justify-center items-center gap-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Popular:</span>
+<a class="px-4 py-1.5 rounded-full bg-surface-variant/30 hover:bg-surface-variant text-on-surface-variant font-label-md text-label-md transition-all" href="#">Jollof Rice</a>
+<a class="px-4 py-1.5 rounded-full bg-surface-variant/30 hover:bg-surface-variant text-on-surface-variant font-label-md text-label-md transition-all" href="#">Shawarma</a>
+<a class="px-4 py-1.5 rounded-full bg-surface-variant/30 hover:bg-surface-variant text-on-surface-variant font-label-md text-label-md transition-all" href="#">Pizza</a>
+<a class="px-4 py-1.5 rounded-full bg-surface-variant/30 hover:bg-surface-variant text-on-surface-variant font-label-md text-label-md transition-all" href="#">Burgers</a>
+</div>
+</div>
+</section>
+<!-- Popular Categories -->
+<section class="py-xl bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto px-container-margin">
+<div class="flex justify-between items-end mb-lg fade-up">
+<div>
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2">Explore Categories</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Find exactly what you're craving</p>
+</div>
+<a class="font-label-md text-label-md text-primary flex items-center gap-xs" href="#">
+                        View all <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-gutter fade-up">
+<!-- Category Card -->
+<div class="group cursor-pointer">
+<div class="bg-surface-container rounded-[32px] p-md flex flex-col items-center gap-sm transition-all duration-300 group-hover:bg-primary-container group-hover:-translate-y-2 group-hover:shadow-xl group-hover:shadow-primary-container/20">
+<div class="w-16 h-16 rounded-2xl bg-surface-container-lowest flex items-center justify-center text-primary group-hover:bg-on-primary-container group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[40px]" style="font-variation-settings: 'FILL' 1;">bia</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface group-hover:text-on-primary-container transition-colors">Pizza</span>
+</div>
+</div>
+<div class="group cursor-pointer">
+<div class="bg-surface-container rounded-[32px] p-md flex flex-col items-center gap-sm transition-all duration-300 group-hover:bg-primary-container group-hover:-translate-y-2 group-hover:shadow-xl group-hover:shadow-primary-container/20">
+<div class="w-16 h-16 rounded-2xl bg-surface-container-lowest flex items-center justify-center text-primary group-hover:bg-on-primary-container group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[40px]" style="font-variation-settings: 'FILL' 1;">lunch_dining</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface group-hover:text-on-primary-container transition-colors">Burgers</span>
+</div>
+</div>
+<div class="group cursor-pointer">
+<div class="bg-surface-container rounded-[32px] p-md flex flex-col items-center gap-sm transition-all duration-300 group-hover:bg-primary-container group-hover:-translate-y-2 group-hover:shadow-xl group-hover:shadow-primary-container/20">
+<div class="w-16 h-16 rounded-2xl bg-surface-container-lowest flex items-center justify-center text-primary group-hover:bg-on-primary-container group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[40px]" style="font-variation-settings: 'FILL' 1;">cooking</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface group-hover:text-on-primary-container transition-colors">Chicken</span>
+</div>
+</div>
+<div class="group cursor-pointer">
+<div class="bg-surface-container rounded-[32px] p-md flex flex-col items-center gap-sm transition-all duration-300 group-hover:bg-primary-container group-hover:-translate-y-2 group-hover:shadow-xl group-hover:shadow-primary-container/20">
+<div class="w-16 h-16 rounded-2xl bg-surface-container-lowest flex items-center justify-center text-primary group-hover:bg-on-primary-container group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[40px]" style="font-variation-settings: 'FILL' 1;">local_bar</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface group-hover:text-on-primary-container transition-colors">Drinks</span>
+</div>
+</div>
+<div class="group cursor-pointer">
+<div class="bg-surface-container rounded-[32px] p-md flex flex-col items-center gap-sm transition-all duration-300 group-hover:bg-primary-container group-hover:-translate-y-2 group-hover:shadow-xl group-hover:shadow-primary-container/20">
+<div class="w-16 h-16 rounded-2xl bg-surface-container-lowest flex items-center justify-center text-primary group-hover:bg-on-primary-container group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[40px]" style="font-variation-settings: 'FILL' 1;">icecream</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface group-hover:text-on-primary-container transition-colors">Dessert</span>
+</div>
+</div>
+<div class="group cursor-pointer">
+<div class="bg-surface-container rounded-[32px] p-md flex flex-col items-center gap-sm transition-all duration-300 group-hover:bg-primary-container group-hover:-translate-y-2 group-hover:shadow-xl group-hover:shadow-primary-container/20">
+<div class="w-16 h-16 rounded-2xl bg-surface-container-lowest flex items-center justify-center text-primary group-hover:bg-on-primary-container group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[40px]" style="font-variation-settings: 'FILL' 1;">skillet</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface group-hover:text-on-primary-container transition-colors">Nigerian</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Featured Restaurants -->
+<section class="py-xl">
+<div class="max-w-7xl mx-auto px-container-margin">
+<div class="mb-lg fade-up">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Featured Restaurants</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Top rated flavors in your neighborhood</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg fade-up">
+<!-- Restaurant Card -->
+<div class="bg-surface-container-lowest rounded-[32px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 hover-lift group border border-outline-variant/10">
+<div class="relative h-[240px] overflow-hidden">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDhTLWQIg9GKnwxIxach3QcJrKjmBYOeIoIBPMEDzNM6fpjl81K610c3rHPIeQu0jVJfjGDYQZlM59k9BlF0Wr8p2bUwMI_TliEF6YM3H8vFPBBO17LmiKD-17DPzT1uzaoPNQZu6hLdksprfROKSjiExeDGtai2rOZRiGYgvrCPPalAhmoFy7uUaCi3eQlYS7j6VVvU5dIlF2ol7sgsprDdNyuHNqUZn15ZwyerVZ-oh2wGKQlyiOhXQomJrxhOAuHCg52B8gYwQo')"></div>
+<div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-on-surface">4.8</span>
+</div>
+</div>
+<div class="p-md">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-headline-md text-on-surface">Jollof &amp; Co.</h3>
+<div class="w-12 h-12 rounded-xl bg-surface-container overflow-hidden border-2 border-surface-container-lowest">
+<img alt="Logo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCb_Nh8Rb3XYs5w0TF9pon4HH3tJLijEssNf3hZbHSC50kn8W5IgRRvlGbGfHiBXZMvN5q7-JDIHK0oAXI0otXGShTCiyH4h2MCnxqVcYAPw0bqQRILRbj2aOC32bYB_wVACUboqasnTN-aLFYxvnJVecC0J00YBJ2ktguRoxQqrqITCafTJKmgJHSJVrheGHDpa8CS8i-W1M07YQeuWzygwpmBzj5um99bb3txFRtMgrAj-ui5h-IHsQlUXjvbc2L0N78UCPVr6i8"/>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">African • Gourmet • Spicy</p>
+<div class="flex items-center gap-lg border-t border-outline-variant/20 pt-4">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[20px] text-primary">schedule</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">25-35 min</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[20px] text-primary">delivery_dining</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Free Delivery</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Repeat for 2 and 3 -->
+<div class="bg-surface-container-lowest rounded-[32px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 hover-lift group border border-outline-variant/10">
+<div class="relative h-[240px] overflow-hidden">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDhTLWQIg9GKnwxIxach3QcJrKjmBYOeIoIBPMEDzNM6fpjl81K610c3rHPIeQu0jVJfjGDYQZlM59k9BlF0Wr8p2bUwMI_TliEF6YM3H8vFPBBO17LmiKD-17DPzT1uzaoPNQZu6hLdksprfROKSjiExeDGtai2rOZRiGYgvrCPPalAhmoFy7uUaCi3eQlYS7j6VVvU5dIlF2ol7sgsprDdNyuHNqUZn15ZwyerVZ-oh2wGKQlyiOhXQomJrxhOAuHCg52B8gYwQo')"></div>
+<div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-on-surface">4.9</span>
+</div>
+</div>
+<div class="p-md">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-headline-md text-on-surface">Pizza Paradise</h3>
+<div class="w-12 h-12 rounded-xl bg-surface-container overflow-hidden border-2 border-surface-container-lowest">
+<img alt="Logo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCb_Nh8Rb3XYs5w0TF9pon4HH3tJLijEssNf3hZbHSC50kn8W5IgRRvlGbGfHiBXZMvN5q7-JDIHK0oAXI0otXGShTCiyH4h2MCnxqVcYAPw0bqQRILRbj2aOC32bYB_wVACUboqasnTN-aLFYxvnJVecC0J00YBJ2ktguRoxQqrqITCafTJKmgJHSJVrheGHDpa8CS8i-W1M07YQeuWzygwpmBzj5um99bb3txFRtMgrAj-ui5h-IHsQlUXjvbc2L0N78UCPVr6i8"/>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">Italian • Fast Food • Cheesy</p>
+<div class="flex items-center gap-lg border-t border-outline-variant/20 pt-4">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[20px] text-primary">schedule</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">15-25 min</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[20px] text-primary">delivery_dining</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">₦500.00</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-[32px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 hover-lift group border border-outline-variant/10">
+<div class="relative h-[240px] overflow-hidden">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDhTLWQIg9GKnwxIxach3QcJrKjmBYOeIoIBPMEDzNM6fpjl81K610c3rHPIeQu0jVJfjGDYQZlM59k9BlF0Wr8p2bUwMI_TliEF6YM3H8vFPBBO17LmiKD-17DPzT1uzaoPNQZu6hLdksprfROKSjiExeDGtai2rOZRiGYgvrCPPalAhmoFy7uUaCi3eQlYS7j6VVvU5dIlF2ol7sgsprDdNyuHNqUZn15ZwyerVZ-oh2wGKQlyiOhXQomJrxhOAuHCg52B8gYwQo')"></div>
+<div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-on-surface">4.7</span>
+</div>
+</div>
+<div class="p-md">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-headline-md text-on-surface">The Burger Bar</h3>
+<div class="w-12 h-12 rounded-xl bg-surface-container overflow-hidden border-2 border-surface-container-lowest">
+<img alt="Logo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCb_Nh8Rb3XYs5w0TF9pon4HH3tJLijEssNf3hZbHSC50kn8W5IgRRvlGbGfHiBXZMvN5q7-JDIHK0oAXI0otXGShTCiyH4h2MCnxqVcYAPw0bqQRILRbj2aOC32bYB_wVACUboqasnTN-aLFYxvnJVecC0J00YBJ2ktguRoxQqrqITCafTJKmgJHSJVrheGHDpa8CS8i-W1M07YQeuWzygwpmBzj5um99bb3txFRtMgrAj-ui5h-IHsQlUXjvbc2L0N78UCPVr6i8"/>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">American • Burgers • Shakes</p>
+<div class="flex items-center gap-lg border-t border-outline-variant/20 pt-4">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[20px] text-primary">schedule</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">20-30 min</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[20px] text-primary">delivery_dining</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Free Delivery</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Restaurant 4: Sushi Zen -->
+<div class="bg-surface-container-lowest rounded-[32px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 hover-lift group border border-outline-variant/10">
+<div class="relative h-[240px] overflow-hidden">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDhTLWQIg9GKnwxIxach3QcJrKjmBYOeIoIBPMEDzNM6fpjl81K610c3rHPIeQu0jVJfjGDYQZlM59k9BlF0Wr8p2bUwMI_TliEF6YM3H8vFPBBO17LmiKD-17DPzT1uzaoPNQZu6hLdksprfROKSjiExeDGtai2rOZRiGYgvrCPPalAhmoFy7uUaCi3eQlYS7j6VVvU5dIlF2ol7sgsprDdNyuHNqUZn15ZwyerVZ-oh2wGKQlyiOhXQomJrxhOAuHCg52B8gYwQo')"></div>
+<div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-on-surface">4.9</span>
+</div>
+</div>
+<div class="p-md">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-headline-md text-on-surface">Sushi Zen</h3>
+<div class="w-12 h-12 rounded-xl bg-surface-container overflow-hidden border-2 border-surface-container-lowest">
+<img alt="Logo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCb_Nh8Rb3XYs5w0TF9pon4HH3tJLijEssNf3hZbHSC50kn8W5IgRRvlGbGfHiBXZMvN5q7-JDIHK0oAXI0otXGShTCiyH4h2MCnxqVcYAPw0bqQRILRbj2aOC32bYB_wVACUboqasnTN-aLFYxvnJVecC0J00YBJ2ktguRoxQqrqITCafTJKmgJHSJVrheGHDpa8CS8i-W1M07YQeuWzygwpmBzj5um99bb3txFRtMgrAj-ui5h-IHsQlUXjvbc2L0N78UCPVr6i8"/>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">Japanese • Sushi • Fresh</p>
+<div class="flex items-center gap-lg border-t border-outline-variant/20 pt-4">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[20px] text-primary">schedule</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">20-30 min</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[20px] text-primary">delivery_dining</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Free Delivery</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Restaurant 5: Taco Fiesta -->
+<div class="bg-surface-container-lowest rounded-[32px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 hover-lift group border border-outline-variant/10">
+<div class="relative h-[240px] overflow-hidden">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDhTLWQIg9GKnwxIxach3QcJrKjmBYOeIoIBPMEDzNM6fpjl81K610c3rHPIeQu0jVJfjGDYQZlM59k9BlF0Wr8p2bUwMI_TliEF6YM3H8vFPBBO17LmiKD-17DPzT1uzaoPNQZu6hLdksprfROKSjiExeDGtai2rOZRiGYgvrCPPalAhmoFy7uUaCi3eQlYS7j6VVvU5dIlF2ol7sgsprDdNyuHNqUZn15ZwyerVZ-oh2wGKQlyiOhXQomJrxhOAuHCg52B8gYwQo')"></div>
+<div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-on-surface">4.7</span>
+</div>
+</div>
+<div class="p-md">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-headline-md text-on-surface">Taco Fiesta</h3>
+<div class="w-12 h-12 rounded-xl bg-surface-container overflow-hidden border-2 border-surface-container-lowest">
+<img alt="Logo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCb_Nh8Rb3XYs5w0TF9pon4HH3tJLijEssNf3hZbHSC50kn8W5IgRRvlGbGfHiBXZMvN5q7-JDIHK0oAXI0otXGShTCiyH4h2MCnxqVcYAPw0bqQRILRbj2aOC32bYB_wVACUboqasnTN-aLFYxvnJVecC0J00YBJ2ktguRoxQqrqITCafTJKmgJHSJVrheGHDpa8CS8i-W1M07YQeuWzygwpmBzj5um99bb3txFRtMgrAj-ui5h-IHsQlUXjvbc2L0N78UCPVr6i8"/>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">Mexican • Tacos • Spicy</p>
+<div class="flex items-center gap-lg border-t border-outline-variant/20 pt-4">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[20px] text-primary">schedule</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">15-25 min</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[20px] text-primary">delivery_dining</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">₦400.00</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Restaurant 6: Pasta Palace -->
+<div class="bg-surface-container-lowest rounded-[32px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 hover-lift group border border-outline-variant/10">
+<div class="relative h-[240px] overflow-hidden">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDhTLWQIg9GKnwxIxach3QcJrKjmBYOeIoIBPMEDzNM6fpjl81K610c3rHPIeQu0jVJfjGDYQZlM59k9BlF0Wr8p2bUwMI_TliEF6YM3H8vFPBBO17LmiKD-17DPzT1uzaoPNQZu6hLdksprfROKSjiExeDGtai2rOZRiGYgvrCPPalAhmoFy7uUaCi3eQlYS7j6VVvU5dIlF2ol7sgsprDdNyuHNqUZn15ZwyerVZ-oh2wGKQlyiOhXQomJrxhOAuHCg52B8gYwQo')"></div>
+<div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-on-surface">4.8</span>
+</div>
+</div>
+<div class="p-md">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-headline-md text-on-surface">Pasta Palace</h3>
+<div class="w-12 h-12 rounded-xl bg-surface-container overflow-hidden border-2 border-surface-container-lowest">
+<img alt="Logo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCb_Nh8Rb3XYs5w0TF9pon4HH3tJLijEssNf3hZbHSC50kn8W5IgRRvlGbGfHiBXZMvN5q7-JDIHK0oAXI0otXGShTCiyH4h2MCnxqVcYAPw0bqQRILRbj2aOC32bYB_wVACUboqasnTN-aLFYxvnJVecC0J00YBJ2ktguRoxQqrqITCafTJKmgJHSJVrheGHDpa8CS8i-W1M07YQeuWzygwpmBzj5um99bb3txFRtMgrAj-ui5h-IHsQlUXjvbc2L0N78UCPVr6i8"/>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">Italian • Pasta • Gourmet</p>
+<div class="flex items-center gap-lg border-t border-outline-variant/20 pt-4">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[20px] text-primary">schedule</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">25-40 min</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[20px] text-primary">delivery_dining</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Free Delivery</span>
+</div>
+</div>
+</div>
+</div></div>
+</div>
+</section>
+<!-- How It Works -->
+<section class="py-xl bg-[#F9FAFB]">
+<div class="max-w-7xl mx-auto px-container-margin">
+<div class="text-center mb-xl fade-up">
+<h2 class="font-headline-lg text-headline-lg mb-2">How It Works</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Your meal is just four steps away</p>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-lg relative">
+<!-- Connector Line (Hidden on Mobile) -->
+<div class="hidden lg:block absolute top-16 left-[10%] right-[10%] h-[2px] bg-outline-variant/30 z-0"></div>
+<div class="flex flex-col items-center text-center fade-up relative z-10" style="transition-delay: 100ms;">
+<div class="w-20 h-20 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg shadow-primary/20 mb-md">
+<span class="material-symbols-outlined text-[32px]">search</span>
+</div>
+<h4 class="font-headline-md text-headline-md mb-xs">Search</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Find your favorite restaurants or cuisines easily.</p>
+</div>
+<div class="flex flex-col items-center text-center fade-up relative z-10" style="transition-delay: 200ms;">
+<div class="w-20 h-20 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg shadow-primary/20 mb-md">
+<span class="material-symbols-outlined text-[32px]">add_shopping_cart</span>
+</div>
+<h4 class="font-headline-md text-headline-md mb-xs">Order</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Select your meals and complete your payment securely.</p>
+</div>
+<div class="flex flex-col items-center text-center fade-up relative z-10" style="transition-delay: 300ms;">
+<div class="w-20 h-20 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg shadow-primary/20 mb-md">
+<span class="material-symbols-outlined text-[32px]">map</span>
+</div>
+<h4 class="font-headline-md text-headline-md mb-xs">Track</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Follow your delivery in real-time from our app.</p>
+</div>
+<div class="flex flex-col items-center text-center fade-up relative z-10" style="transition-delay: 400ms;">
+<div class="w-20 h-20 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg shadow-primary/20 mb-md">
+<span class="material-symbols-outlined text-[32px]">sentiment_satisfied</span>
+</div>
+<h4 class="font-headline-md text-headline-md mb-xs">Enjoy</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Get your fresh food delivered and enjoy!</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Why Choose REDI (Bento Grid) -->
+<section class="py-xl">
+<div class="max-w-7xl mx-auto px-container-margin">
+<div class="mb-lg fade-up">
+<h2 class="font-headline-lg text-headline-lg">Why REDI?</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">The better way to get your food</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 grid-rows-2 gap-gutter min-h-[500px]">
+<div class="md:col-span-2 bg-primary-container text-on-primary-container p-lg rounded-[40px] flex flex-col justify-between fade-up">
+<div>
+<span class="material-symbols-outlined text-[48px] mb-md" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<h3 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-sm">Ultra-Fast Delivery</h3>
+<p class="font-body-md opacity-90 max-w-md">Our optimized logistics ensure your food arrives hot and fresh, usually under 30 minutes. We value your hunger as much as you do.</p>
+</div>
+<div class="mt-lg">
+<div class="flex -space-x-4">
+<div class="w-12 h-12 rounded-full border-4 border-primary-container bg-surface overflow-hidden">
+<div class="w-full h-full bg-primary/20 flex items-center justify-center"><span class="material-symbols-outlined text-primary">person</span></div>
+</div>
+<div class="w-12 h-12 rounded-full border-4 border-primary-container bg-surface overflow-hidden">
+<div class="w-full h-full bg-primary/20 flex items-center justify-center"><span class="material-symbols-outlined text-primary">person</span></div>
+</div>
+<div class="w-12 h-12 rounded-full border-4 border-primary-container bg-surface overflow-hidden">
+<div class="w-full h-full bg-primary/20 flex items-center justify-center"><span class="material-symbols-outlined text-primary">person</span></div>
+</div>
+<div class="h-12 flex items-center px-6 font-label-md">Trusted by 10k+ users</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-variant text-on-surface p-lg rounded-[40px] fade-up" style="transition-delay: 150ms;">
+<span class="material-symbols-outlined text-[48px] text-primary mb-md">verified</span>
+<h3 class="font-headline-md text-headline-md mb-sm">Verified Vendors</h3>
+<p class="font-body-sm text-on-surface-variant">We partner with top-rated restaurants that pass our strict quality and hygiene standards.</p>
+</div>
+<div class="bg-surface-container text-on-surface p-lg rounded-[40px] fade-up" style="transition-delay: 300ms;">
+<span class="material-symbols-outlined text-[48px] text-primary mb-md">location_searching</span>
+<h3 class="font-headline-md text-headline-md mb-sm">Live Tracking</h3>
+<p class="font-body-sm text-on-surface-variant">Know exactly where your food is with high-precision GPS tracking and real-time status updates.</p>
+</div>
+<div class="md:col-span-2 bg-secondary-container text-on-secondary-container p-lg rounded-[40px] flex items-center gap-lg fade-up" style="transition-delay: 450ms;">
+<div class="flex-1">
+<h3 class="font-headline-md text-headline-md mb-sm">24/7 Priority Support</h3>
+<p class="font-body-sm opacity-90">Problems with your order? Our dedicated support team is available around the clock to assist you.</p>
+</div>
+<div class="w-24 h-24 bg-on-secondary-container/10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[48px]">support_agent</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Vendor/Rider Split -->
+<section class="py-xl">
+<div class="max-w-7xl mx-auto px-container-margin grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Vendor -->
+<div class="group relative rounded-[40px] overflow-hidden aspect-[4/3] md:aspect-auto fade-up">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD_ILfWlsZ1FM87UeOjXfaecXz0oTVD4vEAWW5fW2kglTEILVPONgNMpQOH0tl3a6w7_IANy84t42j8rwGw4KBeQeWkLkbTI4y6rFI0xyQBOsIkcwpgMSzXKeZNyv6MvRkH23fXYNFXkC7BtERq64AFtjj-oY9DuJzJuOI_ix0IizjEogAZIEd_hp_D0LOpQBqfDoSAry7ZxCOf64dkZDRHDcv8WQAHSSDC6mLs3s-xIyvD7Sb9kiI2jVZ1RwSH2i1Zgdan4M7ZiUQ')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-xl text-white">
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-sm">Grow Your Food Business</h2>
+<p class="font-body-md mb-lg opacity-90 max-w-sm">Reach thousands of new customers by partnering with the city's fastest delivery network.</p>
+<button class="bg-white text-primary px-8 py-3 rounded-full font-label-md text-label-md hover:bg-primary hover:text-white transition-all shadow-xl">Register Store</button>
+</div>
+</div>
+<!-- Rider -->
+<div class="group relative rounded-[40px] overflow-hidden aspect-[4/3] md:aspect-auto fade-up" style="transition-delay: 200ms;">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBfR5sHQuq8zETYCJPkNkhxXdg7JIYbcYBB1PpJFsXbALQYEPIQiK39P6VVnYwra-JmNmbX2pb_o-Py2nKe_V9FIlfMih6067ptsdxsMAkP4K7-gvSUh4CGYl6JeZIBzIJH4XlSarzwXNlEZsOyw-aKhThwRf5Wz0vFbEqiV0l1ZayUC8MA0cO1_qWbsBiMZlFlZsNpFRUQ56jXCRFCLsW4W5YColMOL5R2U5jrMEuX93fGp5630NiDs0DOnltsmVcGyXjswl2d4Fc')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-xl text-white">
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-sm">Deliver on Your Schedule</h2>
+<p class="font-body-md mb-lg opacity-90 max-w-sm">Earn good money, keep your tips, and work whenever you want. Be your own boss.</p>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-full font-label-md text-label-md hover:opacity-90 transition-all shadow-xl">Join the Fleet</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Stats & FAQ -->
+<section class="py-xl bg-surface-container-low">
+<div class="max-w-7xl mx-auto px-container-margin">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-xl">
+<div class="fade-up">
+<h2 class="font-headline-lg text-headline-lg mb-md">Our Impact</h2>
+<div class="grid grid-cols-2 gap-lg mb-xl">
+<div>
+<p class="text-[48px] font-bold text-primary mb-xs">500k+</p>
+<p class="font-label-md text-on-surface-variant uppercase tracking-wider">Orders Delivered</p>
+</div>
+<div>
+<p class="text-[48px] font-bold text-primary mb-xs">2.5k+</p>
+<p class="font-label-md text-on-surface-variant uppercase tracking-wider">Partner Stores</p>
+</div>
+<div>
+<p class="text-[48px] font-bold text-primary mb-xs">15+</p>
+<p class="font-label-md text-on-surface-variant uppercase tracking-wider">Cities Served</p>
+</div>
+<div>
+<p class="text-[48px] font-bold text-primary mb-xs">4.9</p>
+<p class="font-label-md text-on-surface-variant uppercase tracking-wider">App Rating</p>
+</div>
+</div>
+<p class="font-body-md text-on-surface-variant leading-relaxed">
+                            REDI isn't just about food. We're about connecting communities, empowering small businesses, and providing flexible income opportunities for thousands of riders across the country.
+                        </p>
+</div>
+<div class="fade-up" style="transition-delay: 200ms;">
+<h2 class="font-headline-lg text-headline-lg mb-md">Common Questions</h2>
+<div class="space-y-sm">
+<details class="group bg-surface-container-lowest rounded-2xl p-md border border-outline-variant/10 cursor-pointer transition-all hover:bg-surface-container">
+<summary class="font-label-md text-label-md list-none flex justify-between items-center text-on-surface">
+                                    How much is delivery?
+                                    <span class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<p class="mt-4 font-body-sm text-on-surface-variant">Delivery fees vary based on distance but start as low as ₦300. Look out for restaurants with "Free Delivery" banners!</p>
+</details>
+<details class="group bg-surface-container-lowest rounded-2xl p-md border border-outline-variant/10 cursor-pointer transition-all hover:bg-surface-container">
+<summary class="font-label-md text-label-md list-none flex justify-between items-center text-on-surface">
+                                    Do you accept cash?
+                                    <span class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<p class="mt-4 font-body-sm text-on-surface-variant">Yes! We accept cash on delivery, card payments, and bank transfers through our secure checkout.</p>
+</details>
+<details class="group bg-surface-container-lowest rounded-2xl p-md border border-outline-variant/10 cursor-pointer transition-all hover:bg-surface-container">
+<summary class="font-label-md text-label-md list-none flex justify-between items-center text-on-surface">
+                                    What if my food is wrong?
+                                    <span class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<p class="mt-4 font-body-sm text-on-surface-variant">Our priority is your satisfaction. If there's an issue, use the app to contact support immediately for a refund or redelivery.</p>
+</details>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="py-[120px] relative overflow-hidden">
+<div class="absolute inset-0 bg-primary z-0">
+<div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 24px 24px;"></div>
+</div>
+<div class="relative z-10 max-w-4xl mx-auto px-container-margin text-center text-on-primary fade-up">
+<h2 class="font-headline-xl text-headline-xl mb-md">Hungry?</h2>
+<p class="font-body-lg text-body-lg mb-xl opacity-90">Join thousands of others getting their cravings delivered in minutes. The best meals from the best local spots, right to your doorstep.</p>
+<div class="flex flex-col sm:flex-row justify-center items-center gap-md">
+<button class="bg-white text-primary h-[64px] px-12 rounded-full font-headline-md text-headline-md hover:scale-105 active:scale-95 transition-all shadow-2xl">Start Your Order</button>
+<button class="bg-transparent border-2 border-white/30 text-white h-[64px] px-8 rounded-full font-label-md text-label-md hover:bg-white/10 transition-all">Download App</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="full-width bottom-0 bg-surface-container-lowest border-t border-outline-variant">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-lg px-container-margin py-xl max-w-7xl mx-auto">
+<div class="col-span-2 md:col-span-1">
+<div class="font-headline-md text-headline-md font-bold text-primary mb-md">REDI</div>
+<p class="font-body-sm text-on-surface-variant mb-lg">Connecting you with your favorite meals, fast and fresh.</p>
+<div class="flex gap-md">
+<a class="text-on-surface-variant hover:text-primary" href="#"><span class="material-symbols-outlined">face_nod</span></a>
+<a class="text-on-surface-variant hover:text-primary" href="#"><span class="material-symbols-outlined">alternate_email</span></a>
+</div>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-md">Product</h4>
+<ul class="space-y-xs">
+<li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Mobile App</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Business Solutions</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Features</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Pricing</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-md">Partnership</h4>
+<ul class="space-y-xs">
+<li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Merchant Portal</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Courier Portal</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Integration</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-md">Legal</h4>
+<ul class="space-y-xs">
+<li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Privacy Policy</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Terms of Service</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Cookie Policy</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-7xl mx-auto px-container-margin py-md border-t border-outline-variant/10 text-center">
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 REDI Delivery. All rights reserved.</p>
+</div>
+</footer>
+<script>
+        // Smooth scroll reveal animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+        // Floating action button for mobile
+        const fab = document.createElement('button');
+        fab.className = 'md:hidden fixed bottom-6 right-6 w-16 h-16 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center z-[100] active:scale-95 transition-transform';
+        fab.innerHTML = '<span class="material-symbols-outlined text-[32px]">shopping_basket</span>';
+        document.body.appendChild(fab);
+    </script>
+</body></html>
