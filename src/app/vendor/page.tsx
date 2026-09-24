@@ -1,24 +1,34 @@
 import { DollarSign, TrendingUp, ShoppingBag, Clock } from "lucide-react";
 import ActiveOrdersClient from "@/components/vendor/ActiveOrdersClient";
-import { getSupabaseServerClient } from "@/lib/supabase/serverClient";
+import { supabaseAdmin } from "@/lib/supabase-admin";
+import { getAuthUser } from "@/lib/auth";
 
 export const revalidate = 0; // Dynamic data
 
 export default async function VendorDashboard() {
-  const supabase = await getSupabaseServerClient();
+  const user = await getAuthUser();
+  const userId = user?.dbUserId;
   
-  // For MVP, we just grab the first vendor. In production, this comes from the Auth session.
-  const { data: vendorData } = await supabase.from("vendors").select("id").limit(1).single();
-  const vendorId = vendorData?.id;
+  let vendorId = null;
+  
+  if (userId) {
+    const { data: restaurant } = await supabaseAdmin
+      .from("restaurants")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
+      
+    vendorId = restaurant?.id;
+  }
 
   // Fetch initial active orders
-  let initialOrders = [];
+  let initialOrders: any[] = [];
   if (vendorId) {
-    const { data } = await supabase
+    const { data } = await supabaseAdmin
       .from("orders")
       .select("id, status, created_at, total")
-      .eq("vendor_id", vendorId)
-      .in("status", ["PENDING", "PREPARING", "READY"])
+      .eq("restaurant_id", vendorId) // new schema uses restaurant_id
+      .in("status", ["pending", "preparing", "ready"]) // new schema uses lowercase
       .order("created_at", { ascending: false })
       .limit(20);
     if (data) initialOrders = data;

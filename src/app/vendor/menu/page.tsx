@@ -1,14 +1,22 @@
-import { getSupabaseServerClient } from "@/lib/supabase/serverClient";
+import { supabaseAdmin } from "@/lib/supabase-admin";
+import { getAuthUser } from "@/lib/auth";
 import MenuClient from "@/components/vendor/MenuClient";
 
 export const revalidate = 0; // Dynamic
 
 export default async function VendorMenuPage() {
-  const supabase = await getSupabaseServerClient();
+  const user = await getAuthUser();
+  const userId = user?.dbUserId;
   
-  // For MVP, fetch first vendor
-  const { data: vendorData } = await supabase.from("vendors").select("id").limit(1).single();
-  const vendorId = vendorData?.id || "";
+  let vendorId = "";
+  if (userId) {
+    const { data: restaurant } = await supabaseAdmin
+      .from("restaurants")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
+    vendorId = restaurant?.id || "";
+  }
 
   return <MenuClient vendorId={vendorId} />;
 }

@@ -1,5 +1,5 @@
-import { getSession } from '@auth0/nextjs-auth0';
-import { getSupabaseServerClient } from "@/lib/supabase/serverClient";
+import { currentUser } from '@clerk/nextjs/server';
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import ProfileClient from "@/components/ProfileClient";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -7,14 +7,14 @@ import { ArrowLeft } from "lucide-react";
 export const revalidate = 0;
 
 export default async function ProfilePage() {
-  const session = await getSession();
+  const user = await currentUser();
   
-  if (!session?.user) {
+  if (!user) {
     return (
       <div className="flex flex-col min-h-screen bg-[#FDFDFD] items-center justify-center p-6 text-center">
         <h1 className="text-2xl font-bold font-sora mb-2">Please Log In</h1>
         <p className="text-gray-500 mb-6">You need to be logged in to view your profile and order history.</p>
-        <Link href="/api/auth/login" className="bg-[#f46919] text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-[#d65510] transition">
+        <Link href="/sign-in" className="bg-[#f46919] text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-[#d65510] transition">
           Log In or Sign Up
         </Link>
         <Link href="/" className="mt-4 text-gray-500 font-bold hover:underline">
@@ -24,18 +24,19 @@ export default async function ProfilePage() {
     );
   }
 
-  const userId = session.user.sub;
-  const supabase = await getSupabaseServerClient();
+  const clerkId = user.id;
 
-  // Fetch Profile
-  const { data: profile } = await supabase
-    .from('profiles')
+  // Fetch Profile from our new schema
+  const { data: profile } = await supabaseAdmin
+    .from('users')
     .select('*')
-    .eq('id', userId)
+    .eq('clerk_id', clerkId)
     .single();
 
+  const userId = profile?.id;
+
   // Fetch Order History
-  const { data: orders } = await supabase
+  const { data: orders } = await supabaseAdmin
     .from('orders')
     .select('id, status, created_at, total')
     .eq('customer_id', userId)
@@ -52,9 +53,8 @@ export default async function ProfilePage() {
       </header>
 
       <main className="p-6">
-        {/* Pass data to Client component for interactive tabs */}
         <ProfileClient 
-          initialProfile={profile || { id: userId, full_name: session.user.name || '', role: 'CUSTOMER' }} 
+          initialProfile={profile || { id: userId || clerkId, full_name: user.firstName || '', role: 'customer' }} 
           orders={orders || []} 
         />
       </main>

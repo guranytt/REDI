@@ -1,44 +1,43 @@
 "use server";
 
-import { getSupabaseServerClient } from "@/lib/supabase/serverClient";
-import { getSession } from '@auth0/nextjs-auth0';
+import { supabaseAdmin } from "@/lib/supabase-admin";
+import { getAuthUser } from "@/lib/auth";
 
 export async function addProductAction(formData: FormData) {
   try {
-    const session = await getSession();
-    if (!session?.user) {
+    const user = await getAuthUser();
+    if (!user) {
       throw new Error("Unauthorized: You must be logged in to manage products");
     }
-    const userId = session.user.sub; 
+    const userId = user.dbUserId; 
 
-    const supabase = await getSupabaseServerClient();
-    
     // Validate vendor
-    const { data: vendor } = await supabase
-      .from('vendors')
+    const { data: restaurant } = await supabaseAdmin
+      .from('restaurants')
       .select('id')
-      .eq('owner_id', userId)
+      .eq('user_id', userId)
       .single();
 
-    if (!vendor) throw new Error("Vendor profile not found for this user");
+    if (!restaurant) throw new Error("Vendor profile not found for this user");
 
     // Extract fields
-    const title = formData.get("title") as string;
+    const name = formData.get("title") as string;
     const price = parseFloat(formData.get("price") as string);
     const category_id = formData.get("category_id") as string;
     const image_url = formData.get("image_url") as string;
 
-    if (!title || price <= 0 || !category_id) {
+    if (!name || price <= 0) {
       throw new Error("Invalid product data");
     }
 
     // Insert Product
-    const { error } = await supabase
-      .from('products')
+    const { error } = await supabaseAdmin
+      .from('menu_items')
       .insert({
-        vendor_id: vendor.id,
-        category_id,
-        title,
+        restaurant_id: restaurant.id,
+        category_id: category_id || null, // Optional in schema? Actually we didn't require category_id for MVP if it's tricky
+        name,
+        description: "Delicious " + name,
         price,
         image_url,
         is_available: true

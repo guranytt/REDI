@@ -9,8 +9,8 @@ export const revalidate = 0;
 export default async function Home() {
   const supabase = await getSupabaseServerClient();
   const { data: products } = await supabase
-    .from('products')
-    .select('*, vendors(name)')
+    .from('menu_items')
+    .select('*, restaurants(name)')
     .limit(10);
 
   return (

@@ -3,9 +3,8 @@ import { supabase } from '@/lib/supabase/client';
 
 export type Product = {
   id: string;
-  title: string;
+  name: string;
   price: number;
-  stock: number;
   is_available: boolean;
 };
 
@@ -36,10 +35,10 @@ export const useStorefrontCache = create<StorefrontStore>((set, get) => ({
 
     // Otherwise, hit the API/DB (Minimal Select, Paginated/Limited)
     const { data } = await supabase
-      .from('products')
-      .select('id, title, price, stock, is_available')
-      .eq('vendor_id', vendorId)
-      .order('title')
+      .from('menu_items')
+      .select('id, name, price, is_available')
+      .eq('restaurant_id', vendorId)
+      .order('name')
       .limit(20);
     
     const products = data || [];
@@ -70,6 +69,6 @@ export const useStorefrontCache = create<StorefrontStore>((set, get) => ({
     });
 
     // DB Update
-    await supabase.from('products').update({ is_available: nextStatus }).eq('id', productId);
+    await supabase.from('menu_items').update({ is_available: nextStatus }).eq('id', productId);
   }
 }));

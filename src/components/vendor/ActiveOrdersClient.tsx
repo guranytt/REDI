@@ -21,8 +21,8 @@ export default function ActiveOrdersClient({ initialOrders, vendorId }: { initia
       const { data } = await supabase
         .from("orders")
         .select("id, status, created_at, total")
-        .eq("vendor_id", vendorId)
-        .in("status", ["PENDING", "PREPARING", "READY"])
+        .eq("restaurant_id", vendorId) // new schema uses restaurant_id
+        .in("status", ["pending", "preparing", "ready"])
         .order("created_at", { ascending: false })
         .limit(20);
       
@@ -38,12 +38,12 @@ export default function ActiveOrdersClient({ initialOrders, vendorId }: { initia
   const updateStatus = async (orderId: string, currentStatus: string) => {
     setIsUpdating(orderId);
     
-    let nextStatus = "PREPARING";
-    if (currentStatus === "PREPARING") nextStatus = "READY";
-    if (currentStatus === "READY") nextStatus = "DELIVERED";
+    let nextStatus = "preparing";
+    if (currentStatus === "preparing") nextStatus = "ready";
+    if (currentStatus === "ready") nextStatus = "delivered";
 
     // Optimistic Update
-    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: nextStatus } : o).filter(o => o.status !== "DELIVERED"));
+    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: nextStatus } : o).filter(o => o.status !== "delivered"));
 
     // DB Update (minimal egress)
     await supabase.from("orders").update({ status: nextStatus }).eq("id", orderId);
@@ -51,8 +51,8 @@ export default function ActiveOrdersClient({ initialOrders, vendorId }: { initia
   };
 
   const getStatusColor = (status: string) => {
-    if (status === "PENDING" || status === "NEW") return "bg-red-50 text-[#c82216]";
-    if (status === "PREPARING") return "bg-orange-50 text-[#f46919]";
+    if (status === "pending" || status === "new") return "bg-red-50 text-[#c82216]";
+    if (status === "preparing") return "bg-orange-50 text-[#f46919]";
     return "bg-green-50 text-green-600";
   };
 
@@ -103,7 +103,7 @@ export default function ActiveOrdersClient({ initialOrders, vendorId }: { initia
                   onClick={() => updateStatus(order.id, order.status)}
                   className="text-sm font-bold bg-gray-50 hover:bg-gray-100 px-4 py-1.5 rounded-lg transition disabled:opacity-50"
                 >
-                  {order.status === "PENDING" ? "Start Prep" : order.status === "PREPARING" ? "Mark Ready" : "Complete"}
+                  {order.status === "pending" ? "Start Prep" : order.status === "preparing" ? "Mark Ready" : "Complete"}
                 </button>
               </div>
             </motion.div>

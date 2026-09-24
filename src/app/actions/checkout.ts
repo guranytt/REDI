@@ -1,68 +1,65 @@
 "use server";
 
-import { getSupabaseServerClient } from "@/lib/supabase/serverClient";
-import { getSession } from '@auth0/nextjs-auth0';
+import { supabaseAdmin } from "@/lib/supabase-admin";
+import { getAuthUser } from "@/lib/auth";
 import { sendOrderConfirmation } from "@/lib/email";
 
 interface CheckoutPayload {
   vendorId: string;
   items: {
     productId: string;
+    name: string;
     quantity: number;
     price: number;
   }[];
   deliveryAddress: string;
   deliveryInstructions?: string;
-  paymentMethod: string;
+  deliveryLat?: number;
+  deliveryLng?: number;
+  paystackReference: string;
 }
 
-export async function checkoutAction(payload: CheckoutPayload) {
+export async function createOrderAfterPayment(payload: CheckoutPayload) {
   try {
-    const session = await getSession();
-    if (!session?.user) {
+    const user = await getAuthUser();
+    if (!user) {
       throw new Error("Unauthorized: You must be logged in to checkout.");
     }
-    const userId = session.user.sub;
+    const userId = user.dbUserId;
 
-    const supabase = await getSupabaseServerClient();
-    
-    // Rate Limiting: Check for an order placed in the last 60 seconds
-    const sixtySecondsAgo = new Date(Date.now() - 60000).toISOString();
-    const { data: recentOrders } = await supabase
-      .from('orders')
-      .select('id')
-      .eq('customer_id', userId)
-      .gte('created_at', sixtySecondsAgo)
-      .limit(1);
+    // Fetch restaurant data for delivery_fee and whatsapp_number
+    const { data: vendorData, error: vendorError } = await supabaseAdmin
+      .from('restaurants')
+      .select('name, delivery_fee, whatsapp_number')
+      .eq('id', payload.vendorId)
+      .single();
 
-    if (recentOrders && recentOrders.length > 0) {
-      throw new Error("Rate limit exceeded. Please wait a minute before placing another order.");
+    if (vendorError || !vendorData) {
+      throw new Error("Restaurant not found.");
     }
-    
-    // 1. Calculate totals
+
+    // 1. Calculate totals (in Naira)
     const subtotal = payload.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const deliveryFee = 2.99;
+    const deliveryFee = vendorData.delivery_fee || 500;
     const total = subtotal + deliveryFee;
 
-    // We serialize delivery info to pass it without breaking DB schema if columns don't exist yet, 
-    // or if they do exist, we just insert them. We'll attempt to insert into metadata.
-    // However, if the DB was strictly built, maybe we just omit it for MVP or use an existing field.
-    // Let's assume the DB will accept this JSON payload in a new column or we just log it for now.
-
-    // 2. Insert Order
-    const { data: order, error: orderError } = await supabase
+    // 2. Insert Order (status = 'paid', payment_status = 'paid')
+    const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
       .insert({
         customer_id: userId,
-        vendor_id: payload.vendorId,
+        restaurant_id: payload.vendorId,
         subtotal,
         delivery_fee: deliveryFee,
         total,
-        status: 'PENDING',
-        // Optional: Assuming these columns don't strictly exist, we might get an error.
-        // If we strictly follow the schema from earlier: total, status, customer_id, vendor_id, created_at.
-        // We will omit delivery_address here to prevent breaking the schema, 
-        // OR assume we can add it to a metadata column. For MVP, let's just insert what we know works.
+        status: 'paid',
+        payment_status: 'paid',
+        paystack_reference: payload.paystackReference,
+        delivery_address: payload.deliveryAddress,
+        delivery_notes: payload.deliveryInstructions,
+        delivery_lat: payload.deliveryLat,
+        delivery_lng: payload.deliveryLng,
+        confirmed_at: new Date().toISOString()
       })
       .select('id')
       .single();
@@ -72,36 +69,43 @@ export async function checkoutAction(payload: CheckoutPayload) {
     // 3. Insert Order Items
     const orderItems = payload.items.map(item => ({
       order_id: order.id,
-      product_id: item.productId,
+      menu_item_id: item.productId,
+      name: item.name,
+      unit_price: item.price,
       quantity: item.quantity,
-      price_at_time: item.price
+      subtotal: item.price * item.quantity
     }));
 
-    const { error: itemsError } = await supabase
+    const { error: itemsError } = await supabaseAdmin
       .from('order_items')
       .insert(orderItems);
 
-    // Send confirmation email asynchronously (do not block checkout)
-    const customerName = session.user.name || session.user.nickname || "Foodie";
-    const customerEmail = session.user.email;
-    
-    // Fetch vendor name for the email
-    const { data: vendorData } = await supabase.from('vendors').select('name').eq('id', payload.vendorId).single();
-    const vendorName = vendorData?.name || "REDI Restaurant";
+    if (itemsError) {
+      console.error("Order items error:", itemsError);
+      throw new Error("Failed to save order items.");
+    }
 
+    // Send confirmation email asynchronously
+    const customerEmail = user.email;
     if (customerEmail) {
       sendOrderConfirmation(customerEmail, {
         orderId: order.id,
-        customerName,
-        items: payload.items.map(i => ({ name: 'Item', quantity: i.quantity, price: i.price })), // Ideally map to actual names
+        customerName: user.fullName || "Customer",
+        items: payload.items.map(i => ({ name: i.name, quantity: i.quantity, price: i.price })),
         subtotal,
         deliveryFee,
         total,
-        vendorName
-      });
+        vendorName: vendorData.name
+      }).catch(console.error);
     }
 
-    return { success: true, orderId: order.id };
+    return { 
+      success: true, 
+      orderId: order.id,
+      whatsappNumber: vendorData.whatsapp_number,
+      customerName: user.fullName,
+      customerPhone: user.phone
+    };
   } catch (error: any) {
     console.error("Checkout error:", error);
     return { success: false, error: error.message };

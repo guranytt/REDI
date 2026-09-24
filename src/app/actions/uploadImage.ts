@@ -1,12 +1,12 @@
 "use server";
 
 import cloudinary from "@/lib/cloudinary";
-import { getSession } from "@auth0/nextjs-auth0";
+import { getAuthUser } from "@/lib/auth";
 
 export async function uploadImageAction(formData: FormData) {
   try {
-    const session = await getSession();
-    if (!session?.user) {
+    const user = await getAuthUser();
+    if (!user) {
       throw new Error("Unauthorized: You must be logged in to upload images");
     }
 

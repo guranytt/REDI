@@ -2,7 +2,7 @@ export const pageTransition = {
   initial: { opacity: 0, y: 15 },
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: -15 },
-  transition: { duration: 0.3, ease: "easeOut" }
+  transition: { duration: 0.3, ease: "easeOut" as any }
 };
 
 export const staggerContainer = {
@@ -13,7 +13,7 @@ export const staggerContainer = {
   }
 };
 
-export const cardReveal = {
+export const cardReveal: any = {
   hidden: { opacity: 0, y: 20 },
   show: { 
     opacity: 1, y: 0, 

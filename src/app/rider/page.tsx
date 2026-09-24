@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import { UserButton } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navigation, Package, User, CheckCircle2, MapPin } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
@@ -12,6 +13,7 @@ const MapComponent = dynamic(() => import("@/components/MapComponent"), { ssr: f
 export default function RiderPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("map"); // map or list
+  const [isOnline, setIsOnline] = useState(true);
 
   // Initial Fetch & Realtime Subscription
   useEffect(() => {
@@ -19,7 +21,7 @@ export default function RiderPage() {
       const { data } = await supabase
         .from("orders")
         .select("id, status, created_at, total")
-        .eq("status", "READY") // Riders only care about ready orders
+        .eq("status", "ready") // Riders only care about ready orders
         .limit(20);
       
       if (data) setOrders(data);
@@ -32,7 +34,7 @@ export default function RiderPage() {
       .channel('public:orders')
       .on(
         'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'orders', filter: "status=eq.READY" },
+        { event: 'UPDATE', schema: 'public', table: 'orders', filter: "status=eq.ready" },
         (payload) => {
           // When an order becomes READY, add it to our list
           setOrders(prev => {
@@ -43,7 +45,7 @@ export default function RiderPage() {
       )
       .on(
         'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'orders', filter: "status=eq.DELIVERED" },
+        { event: 'UPDATE', schema: 'public', table: 'orders', filter: "status=eq.delivered" },
         (payload) => {
           // When an order is delivered or taken, remove it
           setOrders(prev => prev.filter(o => o.id !== payload.new.id));
@@ -62,7 +64,7 @@ export default function RiderPage() {
     
     // In reality, status would go to "OUT_FOR_DELIVERY", 
     // but for our MVP schema, we just mark it DELIVERED to clear it out.
-    await supabase.from("orders").update({ status: "DELIVERED" }).eq("id", orderId);
+    await supabase.from("orders").update({ status: "delivered" }).eq("id", orderId);
   };
 
   return (
@@ -75,10 +77,13 @@ export default function RiderPage() {
         {/* Overlay Gradients */}
         <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-black/20 to-transparent z-10 pointer-events-none"></div>
         <div className="absolute top-6 left-6 z-20">
-          <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl shadow-lg border border-white/20 flex items-center space-x-2">
-            <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="font-bold text-sm">Online</span>
-          </div>
+          <button 
+            onClick={() => setIsOnline(!isOnline)}
+            className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl shadow-lg border border-white/20 flex items-center space-x-2 transition-transform hover:scale-105 active:scale-95"
+          >
+            <div className={`w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></div>
+            <span className="font-bold text-sm">{isOnline ? 'Online' : 'Offline'}</span>
+          </button>
         </div>
       </div>
 
@@ -93,19 +98,24 @@ export default function RiderPage() {
         
         <div className="px-6 pb-4 flex items-center justify-between shrink-0">
           <h2 className="text-2xl font-bold font-sora">Nearby Pickups</h2>
-          <span className="bg-orange-50 text-[#f46919] px-3 py-1 rounded-full text-sm font-bold">
-            {orders.length} Ready
+          <span className={`px-3 py-1 rounded-full text-sm font-bold ${isOnline ? 'bg-orange-50 text-[#f46919]' : 'bg-gray-100 text-gray-400'}`}>
+            {isOnline ? `${orders.length} Ready` : 'Offline'}
           </span>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 pb-24 space-y-4">
           <AnimatePresence>
-            {orders.length === 0 && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-10 text-gray-400">
+            {!isOnline ? (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center py-10 text-gray-400">
+                <User className="w-12 h-12 mb-3 opacity-50" />
+                <p>Go online to see delivery requests.</p>
+              </motion.div>
+            ) : orders.length === 0 ? (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center py-10 text-gray-400">
                 <Package className="w-12 h-12 mb-3 opacity-50" />
                 <p>Waiting for new orders...</p>
               </motion.div>
-            )}
+            ) : null}
             
             {orders.map((order) => (
               <motion.div 
@@ -148,10 +158,10 @@ export default function RiderPage() {
             <Navigation className="w-6 h-6 mb-1" />
             <span className="text-[10px] font-bold">Map</span>
           </button>
-          <button className="flex flex-col items-center text-gray-400 hover:text-gray-900 transition">
-            <User className="w-6 h-6 mb-1" />
-            <span className="text-[10px] font-bold">Account</span>
-          </button>
+          <div className="flex flex-col items-center justify-center pt-1">
+            <UserButton afterSignOutUrl="/" />
+            <span className="text-[10px] font-bold mt-1 text-gray-500">Account</span>
+          </div>
         </div>
       </div>
     </div>

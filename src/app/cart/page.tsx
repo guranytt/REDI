@@ -1,14 +1,18 @@
 "use client";
 
 import { useCartStore } from "@/lib/store/cartStore";
-import { Trash2, Plus, Minus, ArrowLeft, MapPin, CreditCard, Banknote, CheckCircle2 } from "lucide-react";
+import { Trash2, Plus, Minus, ArrowLeft, MapPin, CheckCircle2, LocateFixed } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { checkoutAction } from "@/app/actions/checkout";
-import { motion, AnimatePresence } from "framer-motion";
+import { createOrderAfterPayment } from "@/app/actions/checkout";
+import { motion } from "framer-motion";
+import { useUser } from "@clerk/nextjs";
+import { payWithPaystack } from "@/lib/paystack";
 
 export default function CartPage() {
+  const { user } = useUser();
   const { items, removeItem, updateQuantity, getSubtotal, clearCart, getVendorId } = useCartStore();
+  
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
@@ -16,54 +20,124 @@ export default function CartPage() {
   // Delivery form state
   const [address, setAddress] = useState("");
   const [instructions, setInstructions] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [deliveryLat, setDeliveryLat] = useState<number | undefined>();
+  const [deliveryLng, setDeliveryLng] = useState<number | undefined>();
+  const [isLocating, setIsLocating] = useState(false);
+  const [locationSuccess, setLocationSuccess] = useState(false);
   
-  // Success state
-  const [successOrderId, setSuccessOrderId] = useState<string | null>(null);
+  // Success state for the brief transition to WhatsApp
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   const subtotal = getSubtotal();
-  const deliveryFee = 2.99;
+  const deliveryFee = 500; // Fixed in Naira for this task
   const total = subtotal + deliveryFee;
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser");
+      return;
+    }
+    
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setDeliveryLat(position.coords.latitude);
+        setDeliveryLng(position.coords.longitude);
+        setLocationSuccess(true);
+        setIsLocating(false);
+      },
+      (err) => {
+        setError("Unable to retrieve your location");
+        setIsLocating(false);
+      }
+    );
+  };
 
   const handleCheckout = async () => {
     if (items.length === 0) return;
+    if (!user) {
+      window.location.href = "/sign-in?redirect_url=/cart";
+      return;
+    }
     if (!address.trim()) {
       setError("Please enter a delivery address.");
       return;
     }
     
-    setIsCheckingOut(true);
     setError(null);
-    
+    setIsCheckingOut(true);
+
     try {
       const vendorId = getVendorId();
       if (!vendorId) throw new Error("No vendor found in cart.");
 
-      const result = await checkoutAction({
-        vendorId,
-        items: items.map(i => ({ productId: i.id, quantity: i.quantity, price: i.price })),
-        deliveryAddress: address,
-        deliveryInstructions: instructions,
-        paymentMethod
-      });
+      // Open Paystack popup
+      await payWithPaystack({
+        email: user.primaryEmailAddress?.emailAddress || 'customer@example.com',
+        amount: total * 100, // Paystack amount is in kobo
+        ref: `RED_${Math.floor(Math.random() * 1000000000 + 1)}`, // Unique reference
+        onClose: () => {
+          // User closed the payment modal
+          setIsCheckingOut(false);
+        },
+        callback: async (response) => {
+          // Payment was successful on the client side
+          setIsRedirecting(true);
+          
+          const result = await createOrderAfterPayment({
+            vendorId,
+            items: items.map(i => ({ productId: i.id, name: i.name, quantity: i.quantity, price: i.price })),
+            deliveryAddress: address,
+            deliveryInstructions: instructions,
+            deliveryLat,
+            deliveryLng,
+            paystackReference: response.reference,
+          });
 
-      if (result.success) {
-        setSuccessOrderId(result.orderId);
-        clearCart();
-      } else {
-        if (result.error?.includes("Unauthorized")) {
-          window.location.href = "/api/auth/login?returnTo=/cart";
-        } else {
-          setError(result.error);
+          if (result.success) {
+            clearCart();
+            
+            // Build WhatsApp Message
+            let message = `🍽️ *New Order from REDI*\n\n`;
+            message += `*Order ID:* #${result.orderId?.slice(0, 8).toUpperCase()}\n\n`;
+            message += `*Items:*\n`;
+            items.forEach(i => {
+              message += `• ${i.quantity}× ${i.name} — ₦${(i.price * i.quantity).toLocaleString()}\n`;
+            });
+            message += `\n*Total:* ₦${total.toLocaleString()}\n\n`;
+            
+            message += `*Customer:* ${result.customerName || 'Customer'}\n`;
+            if (result.customerPhone) {
+              message += `*Phone:* ${result.customerPhone}\n`;
+            }
+            
+            message += `\n*Delivery Address:* ${address}\n`;
+            if (instructions) {
+              message += `*Note:* ${instructions}\n`;
+            }
+            if (deliveryLat && deliveryLng) {
+              message += `📍 https://maps.google.com/?q=${deliveryLat},${deliveryLng}\n`;
+            }
+
+            const vendorPhone = result.whatsappNumber || '2348000000000'; // fallback
+            const whatsappUrl = `https://wa.me/${vendorPhone}?text=${encodeURIComponent(message)}`;
+            
+            window.location.href = whatsappUrl;
+          } else {
+            // DB Write failed, but payment succeeded
+            setError(`Payment successful (Ref: ${response.reference}) but order saving failed. Please contact support.`);
+            setIsCheckingOut(false);
+            setIsRedirecting(false);
+          }
         }
-      }
+      });
+      
     } catch (e: any) {
       setError(e.message || "Checkout failed");
-    } finally {
       setIsCheckingOut(false);
     }
   };
@@ -76,36 +150,13 @@ export default function CartPage() {
     );
   }
 
-  // SUCCESS MODAL
-  if (successOrderId) {
+  // REDIRECTING STATE
+  if (isRedirecting) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6 relative overflow-hidden">
-        <motion.div 
-          initial={{ scale: 0.8, opacity: 0 }} 
-          animate={{ scale: 1, opacity: 1 }} 
-          transition={{ type: "spring", damping: 15 }}
-          className="bg-white p-8 rounded-[40px] shadow-2xl flex flex-col items-center text-center max-w-md w-full relative z-10"
-        >
-          <div className="w-20 h-20 bg-green-100 text-green-500 rounded-full flex items-center justify-center mb-6">
-            <CheckCircle2 className="w-10 h-10" />
-          </div>
-          <h2 className="text-3xl font-bold font-sora mb-2">Order Confirmed!</h2>
-          <p className="text-gray-500 mb-6">Your delicious food is being prepared. It will be with you shortly.</p>
-          
-          <div className="bg-gray-50 w-full p-4 rounded-2xl mb-8 border border-gray-100">
-            <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Order ID</p>
-            <p className="text-lg font-bold text-gray-900">#{successOrderId.slice(0, 8).toUpperCase()}</p>
-          </div>
-
-          <Link href="/browse" className="w-full bg-[#f46919] text-white py-4 rounded-2xl font-bold text-lg shadow-md hover:bg-[#d65510] transition flex items-center justify-center">
-            Back to Home
-          </Link>
-        </motion.div>
-        
-        {/* Confetti-like background decorative elements */}
-        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-orange-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute top-1/3 right-1/4 w-32 h-32 bg-green-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-1/4 left-1/3 w-32 h-32 bg-yellow-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
+        <div className="w-12 h-12 border-4 border-[#f46919] border-t-transparent rounded-full animate-spin mb-6"></div>
+        <h2 className="text-2xl font-bold font-sora mb-2 text-center">Payment Successful!</h2>
+        <p className="text-gray-500 mb-6 text-center">Saving your order and redirecting to WhatsApp...</p>
       </div>
     );
   }
@@ -151,7 +202,7 @@ export default function CartPage() {
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-gray-900 leading-tight">{item.name}</h3>
-                <p className="text-[#f46919] font-bold mt-1">${item.price}</p>
+                <p className="text-[#f46919] font-bold mt-1">₦{item.price.toLocaleString()}</p>
                 <div className="flex items-center space-x-3 mt-2">
                   <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition">
                     <Minus className="w-3 h-3" />
@@ -173,6 +224,26 @@ export default function CartPage() {
         <div className="space-y-4 mt-8">
           <h2 className="font-bold text-lg px-2">Delivery Details</h2>
           <div className="bg-white p-5 rounded-3xl border border-gray-50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4">
+            
+            <button
+              onClick={handleGetLocation}
+              disabled={isLocating || locationSuccess}
+              className={`w-full py-3 rounded-2xl flex items-center justify-center space-x-2 font-medium transition ${
+                locationSuccess 
+                  ? 'bg-green-50 text-green-600 border border-green-100' 
+                  : 'bg-orange-50 text-[#f46919] hover:bg-orange-100 border border-orange-100'
+              }`}
+            >
+              {isLocating ? (
+                <div className="w-4 h-4 border-2 border-[#f46919] border-t-transparent rounded-full animate-spin"></div>
+              ) : locationSuccess ? (
+                <CheckCircle2 className="w-5 h-5" />
+              ) : (
+                <LocateFixed className="w-5 h-5" />
+              )}
+              <span>{locationSuccess ? 'Location captured' : 'Use my current location'}</span>
+            </button>
+
             <div className="relative">
               <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input 
@@ -192,45 +263,20 @@ export default function CartPage() {
           </div>
         </div>
 
-        {/* Payment Method Section */}
-        <div className="space-y-4 mt-8">
-          <h2 className="font-bold text-lg px-2">Payment Method</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <button 
-              onClick={() => setPaymentMethod('card')}
-              className={`p-4 rounded-3xl border-2 flex flex-col items-center justify-center space-y-2 transition ${
-                paymentMethod === 'card' ? 'border-[#f46919] bg-orange-50/50 text-[#f46919]' : 'border-gray-50 bg-white text-gray-500 shadow-[0_8px_30px_rgb(0,0,0,0.04)]'
-              }`}
-            >
-              <CreditCard className="w-6 h-6" />
-              <span className="font-bold text-sm">Credit Card</span>
-            </button>
-            <button 
-              onClick={() => setPaymentMethod('cash')}
-              className={`p-4 rounded-3xl border-2 flex flex-col items-center justify-center space-y-2 transition ${
-                paymentMethod === 'cash' ? 'border-[#f46919] bg-orange-50/50 text-[#f46919]' : 'border-gray-50 bg-white text-gray-500 shadow-[0_8px_30px_rgb(0,0,0,0.04)]'
-              }`}
-            >
-              <Banknote className="w-6 h-6" />
-              <span className="font-bold text-sm">Cash on Delivery</span>
-            </button>
-          </div>
-        </div>
-
         {/* Summary */}
         <div className="bg-white p-6 rounded-3xl border border-gray-50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-3 mt-8">
           <div className="flex justify-between text-gray-500 font-medium">
             <span>Subtotal</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>₦{subtotal.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-gray-500 font-medium">
             <span>Delivery Fee</span>
-            <span>${deliveryFee.toFixed(2)}</span>
+            <span>₦{deliveryFee.toLocaleString()}</span>
           </div>
           <div className="h-px bg-gray-100 w-full my-4"></div>
           <div className="flex justify-between font-bold text-xl">
             <span>Total</span>
-            <span>${total.toFixed(2)}</span>
+            <span>₦{total.toLocaleString()}</span>
           </div>
         </div>
       </main>
@@ -239,16 +285,16 @@ export default function CartPage() {
       <div className="fixed bottom-0 left-0 right-0 p-4 md:p-6 bg-white border-t border-gray-100 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)] z-20 pb-safe">
         <button 
           onClick={handleCheckout} 
-          disabled={isCheckingOut}
+          disabled={isCheckingOut || isRedirecting}
           className="w-full bg-[#f46919] text-white py-4 rounded-2xl font-bold text-lg shadow-md hover:bg-[#d65510] transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center overflow-hidden relative"
         >
           {isCheckingOut ? (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center space-x-2">
                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-               <span>Processing Order...</span>
+               <span>Initializing Payment...</span>
             </motion.div>
           ) : (
-            <span>Checkout • ${total.toFixed(2)}</span>
+            <span>Pay ₦{total.toLocaleString()}</span>
           )}
         </button>
       </div>

@@ -1,28 +1,26 @@
 "use server";
 
-import { getSupabaseServerClient } from "@/lib/supabase/serverClient";
-import { getSession } from '@auth0/nextjs-auth0';
+import { getAuthUser } from "@/lib/auth";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export async function updateProfileAction(formData: FormData) {
   try {
-    const session = await getSession();
-    if (!session?.user) throw new Error("Unauthorized");
+    const user = await getAuthUser();
+    if (!user) throw new Error("Unauthorized");
     
-    const userId = session.user.sub;
+    const userId = user.dbUserId;
     const fullName = formData.get("fullName") as string;
     const phone = formData.get("phone") as string;
 
-    const supabase = await getSupabaseServerClient();
-
-    // Upsert profile data
-    const { error } = await supabase
-      .from('profiles')
-      .upsert({
-        id: userId,
+    // Update user profile data in users table
+    const { error } = await supabaseAdmin
+      .from('users')
+      .update({
         full_name: fullName,
-        phone_number: phone,
+        phone: phone,
         updated_at: new Date().toISOString()
-      }, { onConflict: 'id' });
+      })
+      .eq('id', userId);
 
     if (error) throw new Error(error.message);
 

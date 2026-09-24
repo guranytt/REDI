@@ -92,7 +92,7 @@ export default function MenuClient({ vendorId }: { vendorId: string }) {
               )}
               {products.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50/50 transition">
-                  <td className="p-4 pl-6 font-bold text-gray-900">{item.title}</td>
+                  <td className="p-4 pl-6 font-bold text-gray-900">{item.name}</td>
                   <td className="p-4 text-sm font-bold text-[#f46919]">${item.price.toFixed(2)}</td>
                   <td className="p-4">
                     <button 

@@ -18,7 +18,7 @@ export default function ProductCard({ item }: { item: any }) {
           whileHover={{ scale: 1.05 }} 
           transition={{ duration: 0.3 }}
           src={item.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600'} 
-          alt={item.title} 
+          alt={item.name} 
           className="w-full h-full object-cover origin-center" 
         />
         {/* Quick fade overlay for Add To Cart */}
@@ -35,8 +35,8 @@ export default function ProductCard({ item }: { item: any }) {
 
         <AddToCartButton product={{
           id: item.id,
-          vendor_id: item.vendor_id,
-          name: item.title,
+          vendor_id: item.restaurant_id,
+          name: item.name,
           price: item.price,
           quantity: 1,
           image_url: item.image_url
@@ -45,11 +45,11 @@ export default function ProductCard({ item }: { item: any }) {
       
       <div className="px-2 pt-4 pb-2">
         <div className="flex justify-between items-start mb-1">
-          <h3 className="font-bold text-gray-900 leading-tight">{item.title}</h3>
+          <h3 className="font-bold text-gray-900 leading-tight">{item.name}</h3>
           <span className="font-bold text-[#f46919] ml-2">${item.price}</span>
         </div>
         <div className="flex items-center space-x-1 text-sm text-gray-500 mb-3">
-          <span>{item.vendors?.name || 'Local Vendor'}</span>
+          <span>{item.restaurants?.name || 'Local Restaurant'}</span>
         </div>
       </div>
     </motion.div>
